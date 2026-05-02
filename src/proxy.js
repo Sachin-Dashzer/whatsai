@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { decryptEdge } from '@/lib/session-edge';
 
-const protectedPrefixes = ['/dashboard', '/inbox', '/contacts', '/broadcasts', '/ai-agent', '/templates', '/analytics', '/settings', '/billing', '/webhooks', '/team', '/account', '/onboarding', '/automation'];
+const protectedPrefixes = ['/dashboard', '/inbox', '/contacts', '/broadcasts', '/ai-agent', '/templates', '/analytics', '/settings', '/billing', '/webhooks', '/team', '/account', '/onboarding', '/automation', '/integrations'];
 const publicRoutes = ['/login', '/register', '/', '/pricing', '/features'];
 
 export default async function middleware(req) {
