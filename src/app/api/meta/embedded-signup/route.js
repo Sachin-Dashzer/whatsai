@@ -17,9 +17,11 @@ export async function POST(req) {
     return NextResponse.json({ error: 'META_APP_ID and META_APP_SECRET must be set' }, { status: 500 });
   }
 
-  // Exchange short-lived code for user access token
+  // Exchange short-lived code for user access token.
+  // redirect_uri must match what the JS SDK uses internally.
+  const redirectUri = encodeURIComponent('https://www.facebook.com/connect/login_success.html');
   const tokenRes = await fetch(
-    `https://graph.facebook.com/${apiVersion}/oauth/access_token?client_id=${appId}&client_secret=${appSecret}&code=${code}`,
+    `https://graph.facebook.com/${apiVersion}/oauth/access_token?client_id=${appId}&client_secret=${appSecret}&code=${code}&redirect_uri=${redirectUri}`,
     { method: 'GET' }
   );
   const tokenData = await tokenRes.json();
