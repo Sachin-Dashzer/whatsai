@@ -125,34 +125,34 @@ export default function ConnectWhatsAppPage() {
 
     sessionInfoRef.current = {};
     try {
-      window.FB.login(async (response) => {
+      window.FB.login((response) => {
         clearTimeout(timeoutRef.current);
         if (response.authResponse?.code) {
-          try {
-            const res = await fetch('/api/meta/embedded-signup', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                code: response.authResponse.code,
-                wabaId: sessionInfoRef.current.wabaId,
-                phoneNumberId: sessionInfoRef.current.phoneNumberId,
-              }),
-            });
-            const data = await res.json();
-            if (data.error) {
-              setError('Connection failed: ' + data.error);
-            } else {
-              setSuccess('WhatsApp connected successfully!');
-              loadSettings();
-            }
-          } catch {
-            setError('Something went wrong. Please try again.');
-          }
+          fetch('/api/meta/embedded-signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              code: response.authResponse.code,
+              wabaId: sessionInfoRef.current.wabaId,
+              phoneNumberId: sessionInfoRef.current.phoneNumberId,
+            }),
+          })
+            .then((r) => r.json())
+            .then((data) => {
+              if (data.error) {
+                setError('Connection failed: ' + data.error);
+              } else {
+                setSuccess('WhatsApp connected successfully!');
+                loadSettings();
+              }
+            })
+            .catch(() => setError('Something went wrong. Please try again.'))
+            .finally(() => setConnecting(false));
         } else {
           const status = response.status || 'unknown';
           setError(`Facebook login was cancelled (status: ${status}). Make sure pop-ups are allowed and try again.`);
+          setConnecting(false);
         }
-        setConnecting(false);
       }, {
         config_id: META_CONFIG_ID,
         response_type: 'code',
