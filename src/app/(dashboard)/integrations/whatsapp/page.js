@@ -124,39 +124,46 @@ export default function ConnectWhatsAppPage() {
     }, 30000);
 
     sessionInfoRef.current = {};
-    window.FB.login(async (response) => {
-      clearTimeout(timeoutRef.current);
-      if (response.authResponse?.code) {
-        try {
-          const res = await fetch('/api/meta/embedded-signup', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              code: response.authResponse.code,
-              wabaId: sessionInfoRef.current.wabaId,
-              phoneNumberId: sessionInfoRef.current.phoneNumberId,
-            }),
-          });
-          const data = await res.json();
-          if (data.error) {
-            setError('Connection failed: ' + data.error);
-          } else {
-            setSuccess('WhatsApp connected successfully!');
-            loadSettings();
+    try {
+      window.FB.login(async (response) => {
+        clearTimeout(timeoutRef.current);
+        if (response.authResponse?.code) {
+          try {
+            const res = await fetch('/api/meta/embedded-signup', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                code: response.authResponse.code,
+                wabaId: sessionInfoRef.current.wabaId,
+                phoneNumberId: sessionInfoRef.current.phoneNumberId,
+              }),
+            });
+            const data = await res.json();
+            if (data.error) {
+              setError('Connection failed: ' + data.error);
+            } else {
+              setSuccess('WhatsApp connected successfully!');
+              loadSettings();
+            }
+          } catch {
+            setError('Something went wrong. Please try again.');
           }
-        } catch {
-          setError('Something went wrong. Please try again.');
+        } else {
+          const status = response.status || 'unknown';
+          setError(`Facebook login was cancelled (status: ${status}). Make sure pop-ups are allowed and try again.`);
         }
-      } else {
-        setError('Facebook login was cancelled or blocked. Make sure pop-ups are allowed and try again.');
-      }
+        setConnecting(false);
+      }, {
+        config_id: META_CONFIG_ID,
+        response_type: 'code',
+        override_default_response_type: true,
+        extras: { setup: {}, featureType: '', sessionInfoVersion: '3' },
+      });
+    } catch (err) {
+      clearTimeout(timeoutRef.current);
       setConnecting(false);
-    }, {
-      config_id: META_CONFIG_ID,
-      response_type: 'code',
-      override_default_response_type: true,
-      extras: { setup: {}, featureType: '', sessionInfoVersion: '3' },
-    });
+      setError('Facebook SDK error: ' + (err?.message || 'Unknown. Check the browser console (F12) for details.'));
+    }
   }
 
   return (
