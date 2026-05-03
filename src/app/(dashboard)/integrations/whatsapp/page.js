@@ -127,12 +127,12 @@ export default function ConnectWhatsAppPage() {
     try {
       window.FB.login((response) => {
         clearTimeout(timeoutRef.current);
-        if (response.authResponse?.code) {
+        if (response.authResponse?.accessToken) {
           fetch('/api/meta/embedded-signup', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              code: response.authResponse.code,
+              accessToken: response.authResponse.accessToken,
               wabaId: sessionInfoRef.current.wabaId,
               phoneNumberId: sessionInfoRef.current.phoneNumberId,
             }),
@@ -150,13 +150,11 @@ export default function ConnectWhatsAppPage() {
             .finally(() => setConnecting(false));
         } else {
           const status = response.status || 'unknown';
-          setError(`Facebook login was cancelled (status: ${status}). Make sure pop-ups are allowed and try again.`);
+          setError(`Facebook login was cancelled (status: ${status}). Please try again.`);
           setConnecting(false);
         }
       }, {
         config_id: META_CONFIG_ID,
-        response_type: 'code',
-        override_default_response_type: true,
         extras: { setup: {}, featureType: '', sessionInfoVersion: '3' },
       });
     } catch (err) {
