@@ -15,11 +15,21 @@ export async function POST(req) {
   if (!broadcast) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const tenant = await Tenant.findById(session.tenantId);
+  if (!tenant?.waConnected) return NextResponse.json({ error: 'WhatsApp is not connected. Please connect in Integrations.' }, { status: 400 });
 
   const query = { tenantId: session.tenantId, optedOut: false };
   if (broadcast.targetTags?.length) query.tags = { $in: broadcast.targetTags };
 
   const contacts = await Contact.find(query).lean();
+
+  // Hard cap to prevent serverless timeout (Vercel limit is ~60s)
+  const BATCH_LIMIT = 100;
+  if (contacts.length > BATCH_LIMIT) {
+    return NextResponse.json(
+      { error: `Broadcast limited to ${BATCH_LIMIT} contacts per send. Please filter by tags to reduce the audience.` },
+      { status: 400 }
+    );
+  }
 
   await Broadcast.findByIdAndUpdate(broadcastId, {
     status: 'running',

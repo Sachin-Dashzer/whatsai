@@ -12,6 +12,11 @@ export async function GET() {
 
 export async function PUT(req) {
   const session = await verifySession();
+
+  if (session.role !== 'owner' && session.role !== 'admin') {
+    return NextResponse.json({ error: 'Only owners and admins can update settings' }, { status: 403 });
+  }
+
   await withDB();
   const data = await req.json();
   const allowed = ['businessName', 'wabaId', 'phoneNumberId', 'accessToken', 'verifiedName'];

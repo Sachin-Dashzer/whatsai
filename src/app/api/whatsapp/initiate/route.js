@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { withDB } from '@/lib/mongodb';
 import { verifySession } from '@/lib/dal';
-import { sendTextMessage } from '@/lib/whatsapp';
+import { sendTemplateMessage } from '@/lib/whatsapp';
 import Tenant from '@/models/Tenant';
 import Contact from '@/models/Contact';
 import Conversation from '@/models/Conversation';
@@ -11,8 +11,8 @@ export async function POST(req) {
   const session = await verifySession();
   await withDB();
 
-  const { contactId, text } = await req.json();
-  if (!contactId || !text) return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
+  const { contactId, templateName } = await req.json();
+  if (!contactId || !templateName) return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
 
   const tenant = await Tenant.findById(session.tenantId);
   if (!tenant) return NextResponse.json({ error: 'Tenant not found' }, { status: 404 });
@@ -22,17 +22,23 @@ export async function POST(req) {
   if (!contact) return NextResponse.json({ error: 'Contact not found' }, { status: 404 });
 
   const normalizedPhone = contact.phone.replace(/\D/g, '');
-  const result = await sendTextMessage(tenant.phoneNumberId, normalizedPhone, text, tenant.accessToken);
+  if (normalizedPhone.length < 10) {
+    return NextResponse.json(
+      { error: 'Invalid phone number — please include the country code (e.g. 919876543210 for India).' },
+      { status: 400 }
+    );
+  }
+
+  const result = await sendTemplateMessage(
+    tenant.phoneNumberId,
+    normalizedPhone,
+    templateName,
+    'en',
+    [],
+    tenant.accessToken
+  );
 
   if (result.error) {
-    const code = result.error.code;
-    const subcode = result.error.error_subcode;
-    if (code === 131026 || subcode === 2388001) {
-      return NextResponse.json(
-        { error: 'Cannot send a text message — this contact has not messaged you in the last 24 hours. Use the New Chat button with a template instead.' },
-        { status: 400 }
-      );
-    }
     return NextResponse.json({ error: result.error.message || 'Meta rejected the message' }, { status: 400 });
   }
 
@@ -49,26 +55,28 @@ export async function POST(req) {
       tenantId: session.tenantId,
       contactId: contact._id,
       status: 'human_takeover',
-      lastMessage: text,
+      lastMessage: `[Template: ${templateName}]`,
       lastMessageAt: new Date(),
     });
   } else {
     await Conversation.findByIdAndUpdate(conversation._id, {
-      lastMessage: text,
+      lastMessage: `[Template: ${templateName}]`,
       lastMessageAt: new Date(),
     });
+    conversation = await Conversation.findById(conversation._id);
   }
 
-  const message = await Message.create({
+  await Message.create({
     tenantId: session.tenantId,
     conversationId: conversation._id,
     contactId: contact._id,
     waMessageId,
     direction: 'outbound',
-    content: text,
+    content: `[Template: ${templateName}]`,
+    type: 'template',
     sentBy: 'agent',
     status: 'sent',
   });
 
-  return NextResponse.json({ message, waResult: result });
+  return NextResponse.json({ conversation, waResult: result });
 }

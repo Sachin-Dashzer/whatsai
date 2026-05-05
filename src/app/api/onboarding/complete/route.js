@@ -17,6 +17,7 @@ export async function POST(req) {
       phoneNumberId: data.phoneNumberId,
       accessToken: data.accessToken,
       verifiedName: data.verifiedName,
+      waConnected: !!(data.wabaId && data.phoneNumberId && data.accessToken),
     });
   }
 

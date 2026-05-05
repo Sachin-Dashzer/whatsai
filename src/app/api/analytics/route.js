@@ -15,7 +15,7 @@ export async function GET(req) {
   const days = parseInt(searchParams.get('days') || '30');
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
-  const tenantId = session.tenantId;
+  const tenantId = new mongoose.Types.ObjectId(session.tenantId);
 
   const [totalMessages, inboundMessages, aiMessages, totalContacts, tenant, stageBreakdown, tagBreakdown] =
     await Promise.all([
@@ -25,11 +25,11 @@ export async function GET(req) {
       Contact.countDocuments({ tenantId, createdAt: { $gte: since } }),
       Tenant.findById(tenantId).select('plan waConnected').lean(),
       Contact.aggregate([
-        { $match: { tenantId: new mongoose.Types.ObjectId(tenantId) } },
+        { $match: { tenantId } },
         { $group: { _id: '$stage', count: { $sum: 1 } } },
       ]),
       Contact.aggregate([
-        { $match: { tenantId: new mongoose.Types.ObjectId(tenantId) } },
+        { $match: { tenantId } },
         { $unwind: '$tags' },
         { $group: { _id: '$tags', count: { $sum: 1 } } },
         { $sort: { count: -1 } },
@@ -38,7 +38,7 @@ export async function GET(req) {
     ]);
 
   const dailyMessages = await Message.aggregate([
-    { $match: { tenantId: new mongoose.Types.ObjectId(tenantId), timestamp: { $gte: since } } },
+    { $match: { tenantId, timestamp: { $gte: since } } },
     {
       $group: {
         _id: {

@@ -8,9 +8,10 @@ export async function PATCH(req, { params }) {
   await withDB();
   const { id } = await params;
   const body = await req.json();
+  const { name, isEnabled, trigger, conditions, actions } = body;
   const flow = await Flow.findOneAndUpdate(
     { _id: id, tenantId: session.tenantId },
-    { ...body, updatedAt: new Date() },
+    { name, isEnabled, trigger, conditions, actions, updatedAt: new Date() },
     { new: true }
   );
   if (!flow) return NextResponse.json({ error: 'Not found' }, { status: 404 });

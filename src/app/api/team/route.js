@@ -24,8 +24,8 @@ export async function POST(req) {
   const { name, email, role = 'agent' } = await req.json();
   if (!email) return NextResponse.json({ error: 'Email is required' }, { status: 400 });
 
-  const existing = await User.findOne({ email: email.toLowerCase() });
-  if (existing) return NextResponse.json({ error: 'This email is already registered' }, { status: 400 });
+  const existing = await User.findOne({ email: email.toLowerCase(), tenantId: session.tenantId });
+  if (existing) return NextResponse.json({ error: 'This email is already a member of your team' }, { status: 400 });
 
   const tempPassword = Math.random().toString(36).slice(-10);
   const hashedPassword = await bcrypt.hash(tempPassword, 10);

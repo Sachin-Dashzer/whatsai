@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npm install *)",
       "Bash(npm run *)",
-      "Bash(del \"c:\\\\dashzer\\\\whatsappai\\\\src\\\\proxy.js\")"
+      "Bash(del \"c:\\\\dashzer\\\\whatsappai\\\\src\\\\proxy.js\")",
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"c:\\\\dashzer\\\\whatsappai\\\\src\\\\app\\\\api\\\\whatsapp\\\\initiate\")"
     ]
   }
 }

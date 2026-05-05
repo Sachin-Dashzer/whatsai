@@ -17,9 +17,10 @@ export async function PUT(req, { params }) {
   await withDB();
   const { id } = await params;
   const data = await req.json();
+  const { name, phone, email, tags, stage, customFields, optedOut, assignedAgent } = data;
   const contact = await Contact.findOneAndUpdate(
     { _id: id, tenantId: session.tenantId },
-    data,
+    { name, phone, email, tags, stage, customFields, optedOut, assignedAgent },
     { new: true }
   );
   if (!contact) return NextResponse.json({ error: 'Not found' }, { status: 404 });

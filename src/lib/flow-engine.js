@@ -1,4 +1,5 @@
 import Flow from '@/models/Flow';
+import Conversation from '@/models/Conversation';
 import { sendTextMessage, sendTemplateMessage } from '@/lib/whatsapp';
 
 export async function executeFlows(tenant, contact, conversation, messageText, isNewContact) {
@@ -65,8 +66,6 @@ function matchesConditions(conditions, contact, messageText) {
 }
 
 async function executeActions(actions, tenant, contact, conversation, messageText) {
-  const { default: Conversation } = await import('@/models/Conversation');
-
   for (const action of actions) {
     try {
       switch (action.type) {

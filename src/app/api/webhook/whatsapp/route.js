@@ -27,22 +27,29 @@ export async function POST(req) {
   const rawBody = await req.text();
 
   const signature = req.headers.get('x-hub-signature-256');
-  if (process.env.META_APP_SECRET && signature) {
+  if (process.env.META_APP_SECRET) {
+    if (!signature) return new Response('Forbidden', { status: 403 });
     const expected = 'sha256=' + crypto.createHmac('sha256', process.env.META_APP_SECRET).update(rawBody).digest('hex');
     if (signature !== expected) {
       return new Response('Forbidden', { status: 403 });
     }
   }
 
-  const body = JSON.parse(rawBody);
+  let body;
+  try {
+    body = JSON.parse(rawBody);
+  } catch {
+    return NextResponse.json({ status: 'ok' });
+  }
 
   if (body.object !== 'whatsapp_business_account') {
     return NextResponse.json({ status: 'ignored' });
   }
 
-  await withDB();
+  try {
+    await withDB();
 
-  for (const entry of body.entry || []) {
+    for (const entry of body.entry || []) {
     const wabaId = entry.id;
     const tenant = await Tenant.findOne({ wabaId });
     if (!tenant) continue;
@@ -74,7 +81,8 @@ export async function POST(req) {
         let isNewContact = false;
         if (!contact) {
           isNewContact = true;
-          const senderName = value.contacts?.[0]?.profile?.name || fromPhone;
+          const senderProfile = value.contacts?.find((c) => c.wa_id === fromPhone);
+          const senderName = senderProfile?.profile?.name || fromPhone;
           contact = await Contact.create({
             tenantId: tenant._id,
             phone: fromPhone,
@@ -161,7 +169,7 @@ export async function POST(req) {
         }
 
         // Execute automation flows (runs after AI, regardless of ai_active status)
-        await executeFlows(tenant, contact, conversation, messageText, isNewContact);
+        ({ contact, conversation } = await executeFlows(tenant, contact, conversation, messageText, isNewContact));
       }
 
       for (const status of value.statuses || []) {
@@ -176,6 +184,10 @@ export async function POST(req) {
         }).catch(() => {});
       }
     }
+  }
+
+  } catch (err) {
+    console.error('Webhook processing error:', err);
   }
 
   return NextResponse.json({ status: 'ok' });
