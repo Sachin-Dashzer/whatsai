@@ -5,11 +5,30 @@ import Tenant from '@/models/Tenant';
 
 export async function POST(req) {
   const session = await verifySession();
-  const { accessToken, wabaId: signupWabaId, phoneNumberId: signupPhoneId } = await req.json();
+  const { code, wabaId: signupWabaId, phoneNumberId: signupPhoneId } = await req.json();
 
-  if (!accessToken) return NextResponse.json({ error: 'Missing access token' }, { status: 400 });
+  if (!code) return NextResponse.json({ error: 'Missing code' }, { status: 400 });
 
+  const appId = process.env.META_APP_ID;
+  const appSecret = process.env.META_APP_SECRET;
   const apiVersion = process.env.META_API_VERSION || 'v19.0';
+
+  if (!appId || !appSecret) {
+    return NextResponse.json({ error: 'META_APP_ID and META_APP_SECRET must be set' }, { status: 500 });
+  }
+
+  // Exchange auth code for access token — no redirect_uri for embedded signup flows
+  const tokenRes = await fetch(
+    `https://graph.facebook.com/${apiVersion}/oauth/access_token?client_id=${appId}&client_secret=${appSecret}&code=${code}`,
+    { method: 'GET' }
+  );
+  const tokenData = await tokenRes.json();
+
+  if (tokenData.error) {
+    return NextResponse.json({ error: tokenData.error.message }, { status: 400 });
+  }
+
+  const accessToken = tokenData.access_token;
 
   let wabaId = signupWabaId;
   let phoneNumberId = signupPhoneId;

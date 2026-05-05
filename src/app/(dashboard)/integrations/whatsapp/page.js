@@ -127,12 +127,12 @@ export default function ConnectWhatsAppPage() {
     try {
       window.FB.login((response) => {
         clearTimeout(timeoutRef.current);
-        if (response.authResponse?.accessToken) {
+        if (response.authResponse?.code) {
           fetch('/api/meta/embedded-signup', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              accessToken: response.authResponse.accessToken,
+              code: response.authResponse.code,
               wabaId: sessionInfoRef.current.wabaId,
               phoneNumberId: sessionInfoRef.current.phoneNumberId,
             }),
@@ -155,6 +155,8 @@ export default function ConnectWhatsAppPage() {
         }
       }, {
         config_id: META_CONFIG_ID,
+        response_type: 'code',
+        override_default_response_type: true,
         extras: { setup: {}, featureType: '', sessionInfoVersion: '3' },
       });
     } catch (err) {
