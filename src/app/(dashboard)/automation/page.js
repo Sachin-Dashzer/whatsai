@@ -121,7 +121,7 @@ export default function AutomationPage() {
         </div>
         <button
           onClick={() => { setForm(DEFAULT_FORM); setShowBuilder(true); }}
-          className="px-4 py-2 bg-[#25D366] hover:bg-[#128C7E] text-white rounded-xl text-sm font-medium transition-colors shadow-sm"
+          className="self-start sm:self-auto flex items-center gap-2 px-4 py-2.5 bg-[#25D366] hover:bg-[#128C7E] text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
         >
           + New Flow
         </button>
@@ -132,14 +132,14 @@ export default function AutomationPage() {
         <div className="text-center py-16 text-slate-400">Loading flows...</div>
       ) : flows.length === 0 ? (
         <div className="text-center py-16">
-          <div className="text-4xl mb-3">⚡</div>
+          <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-3xl mb-4">⚡</div>
           <p className="text-slate-600 font-medium mb-1">No automation flows yet</p>
           <p className="text-slate-400 text-sm">Create a flow to automatically reply, tag contacts, or escalate conversations</p>
         </div>
       ) : (
         <div className="space-y-3">
           {flows.map((flow) => (
-            <div key={flow._id} className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-start gap-4">
+            <div key={flow._id} className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 flex items-start gap-4">
               <div className="text-2xl mt-0.5">{TRIGGER_ICONS[flow.trigger?.type] || '⚡'}</div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
@@ -186,8 +186,8 @@ export default function AutomationPage() {
       {/* Flow Builder Modal */}
       {showBuilder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setShowBuilder(false)} />
-          <div className="relative bg-white border border-slate-200 rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" onClick={() => setShowBuilder(false)} />
+          <div className="relative bg-white border border-slate-100 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between rounded-t-2xl">
               <h3 className="font-bold text-slate-900 text-lg">New Automation Flow</h3>
               <button onClick={() => setShowBuilder(false)} className="text-slate-400 hover:text-slate-700">✕</button>

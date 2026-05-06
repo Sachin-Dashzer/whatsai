@@ -76,7 +76,7 @@ export default function WebhooksPage() {
       </div>
 
       {/* Webhook config card */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-5 shadow-sm">
+      <div className="bg-white border border-slate-100 rounded-2xl p-6 space-y-5 shadow-sm">
         <h3 className="font-semibold text-slate-900 flex items-center gap-2">
           <span className="w-2 h-2 bg-[#25D366] rounded-full animate-pulse" />
           Webhook Configuration
@@ -133,7 +133,7 @@ export default function WebhooksPage() {
       </div>
 
       {/* Event types */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+      <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
         <h3 className="font-semibold text-slate-900 mb-4">Subscribed Event Types</h3>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
@@ -152,7 +152,7 @@ export default function WebhooksPage() {
       </div>
 
       {/* Event log */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm">
+      <div className="bg-white border border-slate-100 rounded-2xl shadow-sm">
         <div className="p-4 border-b border-slate-100 flex flex-wrap items-center gap-3">
           <h3 className="font-semibold text-slate-900">Event Log</h3>
           <span className="text-slate-400 text-sm">{total.toLocaleString()} total events</span>
