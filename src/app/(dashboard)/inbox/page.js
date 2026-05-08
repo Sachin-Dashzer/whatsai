@@ -386,14 +386,18 @@ export default function InboxPage() {
 
   useEffect(() => {
     fetchConversations();
-    const id = setInterval(fetchConversations, 3000);
+    const id = setInterval(() => {
+      if (!document.hidden) fetchConversations();
+    }, 3000);
     return () => clearInterval(id);
   }, [fetchConversations]);
 
   useEffect(() => {
     if (!selectedConv) return;
     fetchMessages(selectedConv._id);
-    const id = setInterval(() => fetchMessages(selectedConv._id), 3000);
+    const id = setInterval(() => {
+      if (!document.hidden) fetchMessages(selectedConv._id);
+    }, 3000);
     return () => clearInterval(id);
   }, [selectedConv, fetchMessages]);
 

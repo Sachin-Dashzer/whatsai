@@ -8,6 +8,7 @@ const TenantSchema = new mongoose.Schema({
   accessToken: String,
   verifiedName: String,
   waConnected: { type: Boolean, default: false },
+  tokenExpiresAt: { type: Date },
   plan: { type: String, enum: ['free', 'basic', 'pro'], default: 'free' },
   isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now },

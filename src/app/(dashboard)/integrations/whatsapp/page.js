@@ -56,6 +56,7 @@ const CONFIG_MISSING = !META_CONFIG_ID || META_CONFIG_ID === 'your_meta_embedded
 export default function ConnectWhatsAppPage() {
   const [connected, setConnected] = useState(false);
   const [verifiedName, setVerifiedName] = useState('');
+  const [tokenExpiry, setTokenExpiry] = useState(null);
   const [connecting, setConnecting] = useState(false);
   const [sdkReady, setSdkReady] = useState(false);
   const [error, setError] = useState('');
@@ -69,6 +70,7 @@ export default function ConnectWhatsAppPage() {
       .then((d) => {
         setConnected(!!d.waConnected);
         setVerifiedName(d.verifiedName || '');
+        setTokenExpiry(d.tokenExpiresAt ? new Date(d.tokenExpiresAt) : null);
       });
   }, []);
 
@@ -204,6 +206,13 @@ export default function ConnectWhatsAppPage() {
             <p className="font-semibold text-green-800">WhatsApp Connected</p>
             {verifiedName && <p className="text-green-700 text-sm">{verifiedName}</p>}
           </div>
+        </div>
+      )}
+
+      {/* Token expiry warning */}
+      {tokenExpiry && (Date.now() > tokenExpiry.getTime() - 7 * 24 * 60 * 60 * 1000) && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
+          ⚠️ Your WhatsApp access token {Date.now() > tokenExpiry.getTime() ? 'has expired' : `expires on ${tokenExpiry.toLocaleDateString()}`}. Reconnect to keep sending messages.
         </div>
       )}
 

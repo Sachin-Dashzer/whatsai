@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { withDB } from '@/lib/mongodb';
 import { verifySession } from '@/lib/dal';
 import { sendTextMessage } from '@/lib/whatsapp';
+import { normalizePhone } from '@/lib/utils';
 import Tenant from '@/models/Tenant';
 import Contact from '@/models/Contact';
 import Conversation from '@/models/Conversation';
@@ -21,7 +22,12 @@ export async function POST(req) {
   const contact = await Contact.findOne({ _id: contactId, tenantId: session.tenantId });
   if (!contact) return NextResponse.json({ error: 'Contact not found' }, { status: 404 });
 
-  const normalizedPhone = contact.phone.replace(/\D/g, '');
+  let normalizedPhone;
+  try {
+    normalizedPhone = normalizePhone(contact.phone);
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: 400 });
+  }
   const result = await sendTextMessage(tenant.phoneNumberId, normalizedPhone, text, tenant.accessToken);
 
   if (result.error) {

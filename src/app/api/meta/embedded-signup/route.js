@@ -28,7 +28,26 @@ export async function POST(req) {
     return NextResponse.json({ error: tokenData.error.message }, { status: 400 });
   }
 
-  const accessToken = tokenData.access_token;
+  const shortLivedToken = tokenData.access_token;
+
+  // Exchange short-lived token for long-lived token (valid ~60 days)
+  const longLivedRes = await fetch(
+    `https://graph.facebook.com/${apiVersion}/oauth/access_token` +
+    `?grant_type=fb_exchange_token` +
+    `&client_id=${appId}` +
+    `&client_secret=${appSecret}` +
+    `&fb_exchange_token=${shortLivedToken}`
+  );
+  const longLivedData = await longLivedRes.json();
+
+  if (longLivedData.error) {
+    return NextResponse.json({ error: 'Failed to get long-lived token: ' + longLivedData.error.message }, { status: 400 });
+  }
+
+  const accessToken = longLivedData.access_token;
+  const tokenExpiresAt = longLivedData.expires_in
+    ? new Date(Date.now() + longLivedData.expires_in * 1000)
+    : null;
 
   let wabaId = signupWabaId;
   let phoneNumberId = signupPhoneId;
@@ -58,6 +77,7 @@ export async function POST(req) {
   const update = {
     accessToken,
     waConnected,
+    ...(tokenExpiresAt && { tokenExpiresAt }),
     ...(wabaId && { wabaId }),
     ...(phoneNumberId && { phoneNumberId }),
     ...(verifiedName && { verifiedName }),

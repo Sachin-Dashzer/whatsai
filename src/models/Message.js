@@ -8,7 +8,7 @@ const MessageSchema = new mongoose.Schema({
   direction: { type: String, enum: ['inbound', 'outbound'], required: true },
   type: {
     type: String,
-    enum: ['text', 'image', 'document', 'audio', 'template', 'interactive'],
+    enum: ['text', 'image', 'document', 'audio', 'template', 'interactive', 'video', 'location', 'sticker'],
     default: 'text',
   },
   content: String,

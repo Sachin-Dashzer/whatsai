@@ -2,10 +2,12 @@ import { NextResponse } from 'next/server';
 import { withDB } from '@/lib/mongodb';
 import { verifySession } from '@/lib/dal';
 import { sendTemplateMessage } from '@/lib/whatsapp';
+import { normalizePhone } from '@/lib/utils';
 import Tenant from '@/models/Tenant';
 import Contact from '@/models/Contact';
 import Conversation from '@/models/Conversation';
 import Message from '@/models/Message';
+import Template from '@/models/Template';
 
 export async function POST(req) {
   const session = await verifySession();
@@ -21,19 +23,21 @@ export async function POST(req) {
   const contact = await Contact.findOne({ _id: contactId, tenantId: session.tenantId });
   if (!contact) return NextResponse.json({ error: 'Contact not found' }, { status: 404 });
 
-  const normalizedPhone = contact.phone.replace(/\D/g, '');
-  if (normalizedPhone.length < 10) {
-    return NextResponse.json(
-      { error: 'Invalid phone number — please include the country code (e.g. 919876543210 for India).' },
-      { status: 400 }
-    );
+  let normalizedPhone;
+  try {
+    normalizedPhone = normalizePhone(contact.phone);
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: 400 });
   }
+
+  const template = await Template.findOne({ tenantId: session.tenantId, name: templateName }).lean();
+  const languageCode = template?.language || 'en';
 
   const result = await sendTemplateMessage(
     tenant.phoneNumberId,
     normalizedPhone,
     templateName,
-    'en',
+    languageCode,
     [],
     tenant.accessToken
   );

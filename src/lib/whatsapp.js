@@ -1,4 +1,6 @@
-const BASE_URL = `https://graph.facebook.com/${process.env.META_API_VERSION}`;
+const API_VERSION = process.env.META_API_VERSION;
+if (!API_VERSION) throw new Error('META_API_VERSION is not set in environment variables');
+const BASE_URL = `https://graph.facebook.com/${API_VERSION}`;
 
 export async function sendTextMessage(phoneNumberId, to, text, accessToken) {
   const res = await fetch(`${BASE_URL}/${phoneNumberId}/messages`, {

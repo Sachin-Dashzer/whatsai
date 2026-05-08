@@ -1,6 +1,8 @@
 import Flow from '@/models/Flow';
 import Conversation from '@/models/Conversation';
+import Template from '@/models/Template';
 import { sendTextMessage, sendTemplateMessage } from '@/lib/whatsapp';
+import { normalizePhone } from '@/lib/utils';
 
 export async function executeFlows(tenant, contact, conversation, messageText, isNewContact) {
   const flows = await Flow.find({ tenantId: tenant._id, isEnabled: true }).lean();
@@ -71,7 +73,8 @@ async function executeActions(actions, tenant, contact, conversation, messageTex
       switch (action.type) {
         case 'send_message':
           if (action.params?.text) {
-            await sendTextMessage(tenant.phoneNumberId, contact.phone, action.params.text, tenant.accessToken);
+            const phone = normalizePhone(contact.phone);
+            await sendTextMessage(tenant.phoneNumberId, phone, action.params.text, tenant.accessToken);
           }
           break;
         case 'add_tag':
@@ -101,11 +104,14 @@ async function executeActions(actions, tenant, contact, conversation, messageTex
           break;
         case 'send_template':
           if (action.params?.templateName) {
+            const phone = normalizePhone(contact.phone);
+            const tmpl = await Template.findOne({ tenantId: tenant._id, name: action.params.templateName }).lean();
+            const languageCode = tmpl?.language || 'en';
             await sendTemplateMessage(
               tenant.phoneNumberId,
-              contact.phone,
+              phone,
               action.params.templateName,
-              'en',
+              languageCode,
               [],
               tenant.accessToken
             );
