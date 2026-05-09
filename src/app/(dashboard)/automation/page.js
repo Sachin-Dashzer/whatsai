@@ -114,10 +114,10 @@ export default function AutomationPage() {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-bold text-slate-900">Automation Flows</h2>
-          <p className="text-slate-500 text-sm">Trigger actions automatically when contacts message you</p>
+          <h2 className="text-xl font-bold text-slate-900">Automation Flows</h2>
+          <p className="text-slate-500 text-sm mt-0.5">Trigger actions automatically when contacts message you</p>
         </div>
         <button
           onClick={() => { setForm(DEFAULT_FORM); setShowBuilder(true); }}
@@ -185,15 +185,18 @@ export default function AutomationPage() {
 
       {/* Flow Builder Modal */}
       {showBuilder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" onClick={() => setShowBuilder(false)} />
-          <div className="relative bg-white border border-slate-100 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+          <div className="relative bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+            <div className="sm:hidden flex justify-center pt-3 pb-1 shrink-0">
+              <div className="w-10 h-1 bg-slate-200 rounded-full" />
+            </div>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 shrink-0">
               <h3 className="font-bold text-slate-900 text-lg">New Automation Flow</h3>
-              <button onClick={() => setShowBuilder(false)} className="text-slate-400 hover:text-slate-700">✕</button>
+              <button onClick={() => setShowBuilder(false)} className="text-slate-400 hover:text-slate-700 p-1">✕</button>
             </div>
 
-            <form onSubmit={saveFlow} className="p-6 space-y-5">
+            <form onSubmit={saveFlow} className="p-6 space-y-5 overflow-y-auto flex-1">
               {/* Flow name */}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">Flow Name</label>
@@ -327,7 +330,7 @@ export default function AutomationPage() {
                   disabled={saving}
                   className="flex-1 py-2.5 bg-[#25D366] hover:bg-[#128C7E] disabled:opacity-60 text-white rounded-xl text-sm font-semibold shadow-sm"
                 >
-                  {saving ? 'Saving...' : 'Create Flow'}
+                  {saving ? 'Saving…' : 'Create Flow'}
                 </button>
               </div>
             </form>

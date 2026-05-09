@@ -69,10 +69,10 @@ export default function WebhooksPage() {
   const eventTypes = ['message.text', 'message.image', 'status.delivered', 'status.read', 'status.failed'];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div>
-        <h2 className="text-lg font-bold text-slate-900">Webhook Management</h2>
-        <p className="text-slate-500 text-sm">Configure Meta Webhook URL, monitor incoming events, and debug integrations</p>
+        <h2 className="text-xl font-bold text-slate-900 tracking-tight">Webhooks</h2>
+        <p className="text-slate-500 text-sm mt-1">Configure Meta Webhook URL, monitor incoming events, and debug integrations</p>
       </div>
 
       {/* Webhook config card */}
@@ -153,76 +153,106 @@ export default function WebhooksPage() {
 
       {/* Event log */}
       <div className="bg-white border border-slate-100 rounded-2xl shadow-sm">
-        <div className="p-4 border-b border-slate-100 flex flex-wrap items-center gap-3">
-          <h3 className="font-semibold text-slate-900">Event Log</h3>
-          <span className="text-slate-400 text-sm">{total.toLocaleString()} total events</span>
-
-          <div className="flex gap-1 ml-auto flex-wrap">
-            <button onClick={() => { setTypeFilter(''); setPage(1); }} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${!typeFilter ? 'bg-[#25D366] text-white' : 'bg-slate-100 text-slate-600 hover:text-slate-900'}`}>
-              All
-            </button>
-            {eventTypes.map((t) => (
-              <button key={t} onClick={() => { setTypeFilter(t.split('.')[0]); setPage(1); }} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${typeFilter === t.split('.')[0] ? 'bg-[#25D366] text-white' : 'bg-slate-100 text-slate-600 hover:text-slate-900'}`}>
-                {t}
-              </button>
-            ))}
-            <button onClick={clearEvents} disabled={clearing || events.length === 0} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-40 transition-colors ml-2">
+        {/* Header + filters */}
+        <div className="p-4 border-b border-slate-100 space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <h3 className="font-semibold text-slate-900">Event Log</h3>
+              <p className="text-slate-400 text-xs mt-0.5">{total.toLocaleString()} total events</p>
+            </div>
+            <button onClick={clearEvents} disabled={clearing || events.length === 0} className="shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-40 transition-colors">
               Clear logs
             </button>
           </div>
+          <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+            <button onClick={() => { setTypeFilter(''); setPage(1); }} className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${!typeFilter ? 'bg-[#25D366] text-white' : 'bg-slate-100 text-slate-600 hover:text-slate-900'}`}>
+              All
+            </button>
+            {eventTypes.map((t) => (
+              <button key={t} onClick={() => { setTypeFilter(t.split('.')[0]); setPage(1); }} className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${typeFilter === t.split('.')[0] ? 'bg-[#25D366] text-white' : 'bg-slate-100 text-slate-600 hover:text-slate-900'}`}>
+                {t}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-100 bg-slate-50">
-                {['Time', 'Event Type', 'Phone', 'Message ID', 'Status', ''].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-xs text-slate-500 font-semibold uppercase tracking-wider">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {events.map((event) => (
-                <tr key={event._id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-4 py-3 text-slate-400 text-xs whitespace-nowrap">{formatTs(event.receivedAt)}</td>
-                  <td className="px-4 py-3">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${EVENT_COLORS[event.eventType] || 'bg-slate-100 text-slate-600'}`}>
-                      {event.eventType}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-slate-700 font-mono text-xs">{event.phone || '—'}</td>
-                  <td className="px-4 py-3 text-slate-400 font-mono text-xs truncate max-w-32">{event.messageId || '—'}</td>
-                  <td className="px-4 py-3">
-                    <span className={`text-xs font-medium ${event.status === 'processed' ? 'text-green-600' : event.status === 'failed' ? 'text-red-500' : 'text-slate-400'}`}>
-                      {event.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <button onClick={() => setSelected(event)} className="text-xs text-slate-400 hover:text-[#25D366] transition-colors font-medium">
-                      View payload
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {events.length === 0 && (
+        {events.length === 0 ? (
           <div className="py-16 text-center">
             <div className="text-3xl mb-3">📭</div>
             <p className="text-slate-600 font-medium">No webhook events yet</p>
-            <p className="text-slate-400 text-sm mt-1">Events will appear here when your WhatsApp number receives messages</p>
+            <p className="text-slate-400 text-sm mt-1">Events appear here when your WhatsApp number receives messages</p>
           </div>
+        ) : (
+          <>
+            {/* Mobile cards */}
+            <div className="sm:hidden divide-y divide-slate-100">
+              {events.map((event) => (
+                <div key={event._id} className="p-4 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${EVENT_COLORS[event.eventType] || 'bg-slate-100 text-slate-600'}`}>
+                      {event.eventType}
+                    </span>
+                    <span className={`text-xs font-semibold ${event.status === 'processed' ? 'text-emerald-600' : event.status === 'failed' ? 'text-red-500' : 'text-slate-400'}`}>
+                      {event.status}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-400">{formatTs(event.receivedAt)}</span>
+                    <span className="font-mono text-slate-600">{event.phone || '—'}</span>
+                  </div>
+                  <button onClick={() => setSelected(event)} className="text-xs text-[#25D366] font-semibold hover:underline">
+                    View payload →
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop table */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-100 bg-slate-50">
+                    {['Time', 'Event Type', 'Phone', 'Message ID', 'Status', ''].map((h) => (
+                      <th key={h} className="px-4 py-3 text-left text-xs text-slate-500 font-semibold uppercase tracking-wider">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {events.map((event) => (
+                    <tr key={event._id} className="hover:bg-slate-50 transition-colors">
+                      <td className="px-4 py-3 text-slate-400 text-xs whitespace-nowrap">{formatTs(event.receivedAt)}</td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${EVENT_COLORS[event.eventType] || 'bg-slate-100 text-slate-600'}`}>
+                          {event.eventType}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-slate-700 font-mono text-xs">{event.phone || '—'}</td>
+                      <td className="px-4 py-3 text-slate-400 font-mono text-xs truncate max-w-32">{event.messageId || '—'}</td>
+                      <td className="px-4 py-3">
+                        <span className={`text-xs font-semibold ${event.status === 'processed' ? 'text-emerald-600' : event.status === 'failed' ? 'text-red-500' : 'text-slate-400'}`}>
+                          {event.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <button onClick={() => setSelected(event)} className="text-xs text-slate-400 hover:text-[#25D366] transition-colors font-medium whitespace-nowrap">
+                          View payload
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
 
         {pages > 1 && (
           <div className="p-4 border-t border-slate-100 flex items-center justify-between">
-            <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1} className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium disabled:opacity-40">
-              ← Previous
+            <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold disabled:opacity-40 transition-colors">
+              ← Prev
             </button>
             <span className="text-slate-500 text-sm">Page {page} of {pages}</span>
-            <button onClick={() => setPage(Math.min(pages, page + 1))} disabled={page === pages} className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium disabled:opacity-40">
+            <button onClick={() => setPage(Math.min(pages, page + 1))} disabled={page === pages} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-semibold disabled:opacity-40 transition-colors">
               Next →
             </button>
           </div>
@@ -233,7 +263,7 @@ export default function WebhooksPage() {
       {selected && (
         <div className="fixed inset-0 z-50 flex justify-end">
           <div className="absolute inset-0 bg-black/40" onClick={() => setSelected(null)} />
-          <div className="relative w-full max-w-xl bg-white border-l border-slate-200 h-full overflow-y-auto shadow-xl">
+          <div className="relative w-full sm:max-w-xl bg-white border-l border-slate-200 h-full overflow-y-auto shadow-xl">
             <div className="sticky top-0 bg-white p-4 border-b border-slate-100 flex items-center justify-between">
               <div>
                 <h3 className="font-semibold text-slate-900">Event Payload</h3>

@@ -156,9 +156,13 @@ export default function BroadcastsPage() {
 
       {/* Create broadcast modal */}
       {showCreate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" onClick={closeModal} />
-          <div className="relative bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={closeModal} />
+          <div className="relative bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+            {/* Mobile drag handle */}
+            <div className="sm:hidden flex justify-center pt-3 pb-1 shrink-0">
+              <div className="w-10 h-1 bg-slate-200 rounded-full" />
+            </div>
             {/* Modal header */}
             <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-slate-100">
               <h3 className="font-bold text-slate-900">New Broadcast</h3>

@@ -787,7 +787,7 @@ export default function InboxPage() {
         />
       )}
 
-      <div className="flex h-full -m-6 overflow-hidden">
+      <div className="flex h-full -m-3 sm:-m-5 lg:-m-6 overflow-hidden">
         {ConvList}
         {ChatWindow}
         {ContactPanel}

@@ -121,8 +121,8 @@ export default function BillingPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-bold text-slate-900">Billing & Plans</h2>
-        <p className="text-slate-500 text-sm">SaaS subscription via Razorpay — WhatsApp conversation costs are billed directly by Meta</p>
+        <h2 className="text-xl font-bold text-slate-900">Billing & Plans</h2>
+        <p className="text-slate-500 text-sm mt-0.5">SaaS subscription via Razorpay — WhatsApp conversation costs are billed directly by Meta</p>
       </div>
 
       {/* Meta billing notice */}

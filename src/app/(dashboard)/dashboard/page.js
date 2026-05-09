@@ -51,16 +51,16 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Hero */}
-      <div className="relative bg-[#0f172a] rounded-2xl p-6 overflow-hidden">
+      <div className="relative bg-[#0f172a] rounded-2xl p-4 sm:p-6 overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 70% 50%, #25D366 0%, transparent 60%)' }} />
-        <div className="relative flex items-center justify-between gap-4">
+        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <p className="text-slate-400 text-sm mb-1">{greeting} 👋</p>
-            <h2 className="text-2xl font-bold text-white leading-tight">Your workspace overview</h2>
-            <p className="text-slate-400 text-sm mt-1">Last 30 days · {new Date().toLocaleDateString('en-IN', { dateStyle: 'long' })}</p>
+            <h2 className="text-xl sm:text-2xl font-bold text-white leading-tight">Your workspace overview</h2>
+            <p className="text-slate-400 text-xs sm:text-sm mt-1">Last 30 days · {new Date().toLocaleDateString('en-IN', { dateStyle: 'long' })}</p>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${waConnected ? 'bg-[#25D366]/20 text-[#25D366]' : 'bg-amber-500/20 text-amber-400'}`}>
+          <div className="flex items-center gap-2">
+            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${waConnected ? 'bg-[#25D366]/20 text-[#25D366]' : 'bg-amber-500/20 text-amber-400'}`}>
               <span className={`w-2 h-2 rounded-full ${waConnected ? 'bg-[#25D366] animate-pulse' : 'bg-amber-400'}`} />
               {waConnected ? 'WhatsApp Live' : 'Not Connected'}
             </div>
@@ -84,18 +84,18 @@ export default async function DashboardPage() {
             <h3 className="font-bold text-slate-900">Conversation Pipeline</h3>
             <Link href="/inbox" className="text-xs font-semibold text-[#25D366] hover:underline">View inbox →</Link>
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {[
               { label: 'Open', value: openConversations, color: 'bg-blue-50 text-blue-700 border-blue-100', dot: 'bg-blue-500' },
               { label: 'Resolved', value: resolvedThisMonth, color: 'bg-green-50 text-green-700 border-green-100', dot: 'bg-[#25D366]' },
               { label: 'AI Messages', value: aiMessages, color: 'bg-violet-50 text-violet-700 border-violet-100', dot: 'bg-violet-500' },
             ].map((item) => (
-              <div key={item.label} className={`rounded-xl border p-4 ${item.color}`}>
-                <div className="flex items-center gap-1.5 mb-2">
+              <div key={item.label} className={`rounded-xl border p-4 flex sm:flex-col items-center sm:items-start justify-between sm:justify-start gap-2 ${item.color}`}>
+                <div className="flex items-center gap-1.5">
                   <span className={`w-2 h-2 rounded-full ${item.dot}`} />
                   <span className="text-xs font-semibold uppercase tracking-wide opacity-70">{item.label}</span>
                 </div>
-                <p className="text-3xl font-bold leading-none">{item.value.toLocaleString()}</p>
+                <p className="text-2xl sm:text-3xl font-bold leading-none sm:mt-2">{item.value.toLocaleString()}</p>
               </div>
             ))}
           </div>

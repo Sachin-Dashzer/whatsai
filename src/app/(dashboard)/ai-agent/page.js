@@ -241,11 +241,29 @@ export default function AIAgentPage() {
         </div>
       </div>
 
+      {/* ── Mobile horizontal section tabs (hidden on lg+) ── */}
+      <div className="lg:hidden flex gap-1.5 overflow-x-auto pb-1 -mx-3 sm:-mx-5 px-3 sm:px-5 scrollbar-hide">
+        {SECTIONS.map((s) => (
+          <button
+            key={s.id}
+            onClick={() => scrollTo(s.id)}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
+              activeSection === s.id
+                ? 'bg-[#25D366] text-white shadow-sm'
+                : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300'
+            }`}
+          >
+            <span>{s.icon}</span>
+            {s.label}
+          </button>
+        ))}
+      </div>
+
       {/* ── Two-column layout ── */}
       <div className="grid grid-cols-1 lg:grid-cols-[200px_1fr] gap-6 items-start">
 
-        {/* Side nav */}
-        <nav className="lg:sticky lg:top-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-2">
+        {/* Side nav — desktop only */}
+        <nav className="hidden lg:block lg:sticky lg:top-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-2">
           {SECTIONS.map((s) => (
             <button
               key={s.id}
@@ -449,7 +467,7 @@ export default function AIAgentPage() {
                 No rules yet. Auto-tag contacts based on keywords.
               </div>
             )}
-            <div className="grid grid-cols-3 gap-2 mb-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-2">
               <input type="text" placeholder="Keyword" value={newTagRule.keyword} onChange={(e) => setNewTagRule({ ...newTagRule, keyword: e.target.value })} className={inputCls} />
               <input type="text" placeholder="Tag name" value={newTagRule.tag} onChange={(e) => setNewTagRule({ ...newTagRule, tag: e.target.value })} className={inputCls} />
               <input type="text" placeholder="Stage (optional)" value={newTagRule.stage} onChange={(e) => setNewTagRule({ ...newTagRule, stage: e.target.value })} className={inputCls} />
@@ -565,7 +583,7 @@ export default function AIAgentPage() {
       </div>
 
       {/* Floating save bar */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
         <button
           onClick={save}
           disabled={saving}

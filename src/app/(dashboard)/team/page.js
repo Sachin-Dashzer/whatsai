@@ -123,68 +123,102 @@ export default function TeamPage() {
         </div>
       )}
 
-      {/* Member table */}
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-slate-100 bg-slate-50/50">
-              <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Member</th>
-              <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider hidden sm:table-cell">Role</th>
-              <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Joined</th>
-              <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider hidden sm:table-cell">Status</th>
-              <th className="px-5 py-3.5 w-16" />
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
+      {/* Member list */}
+      {members.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-2xl border border-slate-100 shadow-sm">
+          <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center text-2xl mb-3">👤</div>
+          <p className="text-slate-500 text-sm">No team members yet</p>
+        </div>
+      ) : (
+        <>
+          {/* Mobile cards */}
+          <div className="sm:hidden space-y-2">
             {members.map((member) => (
-              <tr key={member._id} className="hover:bg-slate-50 transition-colors group">
-                <td className="px-5 py-4">
-                  <div className="flex items-center gap-3">
-                    <Avatar name={member.name} email={member.email} />
-                    <div className="min-w-0">
+              <div key={member._id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+                <div className="flex items-center gap-3">
+                  <Avatar name={member.name} email={member.email} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-sm font-semibold text-slate-900 truncate">{member.name || '—'}</p>
-                      <p className="text-xs text-slate-400 truncate">{member.email}</p>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize shrink-0 ${ROLE_STYLES[member.role] || ROLE_STYLES.agent}`}>
+                        {member.role}
+                      </span>
                     </div>
+                    <p className="text-xs text-slate-400 truncate mt-0.5">{member.email}</p>
                   </div>
-                </td>
-                <td className="px-5 py-4 hidden sm:table-cell">
-                  <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize ${ROLE_STYLES[member.role] || ROLE_STYLES.agent}`}>
-                    {member.role}
-                  </span>
-                </td>
-                <td className="px-5 py-4 hidden md:table-cell">
-                  <span className="text-sm text-slate-500">
-                    {new Date(member.createdAt).toLocaleDateString('en-IN', { dateStyle: 'medium' })}
-                  </span>
-                </td>
-                <td className="px-5 py-4 hidden sm:table-cell">
-                  <span className={`flex items-center gap-1.5 text-xs font-medium ${member.isActive ? 'text-emerald-600' : 'text-slate-400'}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${member.isActive ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-                    {member.isActive ? 'Active' : 'Inactive'}
-                  </span>
-                </td>
-                <td className="px-5 py-4 text-right">
-                  {member.role !== 'owner' && (
-                    <button
-                      onClick={() => removeMember(member._id)}
-                      className="text-xs text-slate-300 group-hover:text-red-400 hover:text-red-500 transition-colors font-semibold"
-                    >
-                      Remove
-                    </button>
-                  )}
-                </td>
-              </tr>
+                  <div className="flex flex-col items-end gap-2 shrink-0">
+                    <span className={`flex items-center gap-1 text-[10px] font-semibold ${member.isActive ? 'text-emerald-600' : 'text-slate-400'}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${member.isActive ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                      {member.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                    {member.role !== 'owner' && (
+                      <button onClick={() => removeMember(member._id)} className="text-xs text-red-400 hover:text-red-600 font-semibold transition-colors">
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
-
-        {members.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center text-2xl mb-3">👤</div>
-            <p className="text-slate-500 text-sm">No team members yet</p>
           </div>
-        )}
-      </div>
+
+          {/* Desktop table */}
+          <div className="hidden sm:block bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-slate-100 bg-slate-50/50">
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Member</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Role</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider hidden md:table-cell">Joined</th>
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                  <th className="px-5 py-3.5 w-16" />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {members.map((member) => (
+                  <tr key={member._id} className="hover:bg-slate-50 transition-colors group">
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-3">
+                        <Avatar name={member.name} email={member.email} />
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-slate-900 truncate">{member.name || '—'}</p>
+                          <p className="text-xs text-slate-400 truncate">{member.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize ${ROLE_STYLES[member.role] || ROLE_STYLES.agent}`}>
+                        {member.role}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4 hidden md:table-cell">
+                      <span className="text-sm text-slate-500">
+                        {new Date(member.createdAt).toLocaleDateString('en-IN', { dateStyle: 'medium' })}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className={`flex items-center gap-1.5 text-xs font-medium ${member.isActive ? 'text-emerald-600' : 'text-slate-400'}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${member.isActive ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+                        {member.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      {member.role !== 'owner' && (
+                        <button
+                          onClick={() => removeMember(member._id)}
+                          className="text-xs text-slate-300 group-hover:text-red-400 hover:text-red-500 transition-colors font-semibold"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
 
       {/* Invite modal */}
       {showInvite && (
