@@ -451,7 +451,7 @@ export default function InboxPage() {
 
   /* ── Conversation list ──────────────────────────────────── */
   const ConvList = (
-    <div className={`flex flex-col bg-white border-r border-slate-200 shrink-0 w-full md:w-80 lg:w-[340px] ${mobileView === 'chat' ? 'hidden md:flex' : 'flex'}`}>
+    <div className={`flex flex-col bg-white border-r border-slate-100 shrink-0 w-full md:w-72 lg:w-80 ${mobileView === 'chat' ? 'hidden md:flex' : 'flex'}`}>
       {/* Header */}
       <div className="px-4 pt-4 pb-3 border-b border-slate-100 space-y-3 bg-white">
         <div className="flex items-center justify-between">
@@ -571,7 +571,7 @@ export default function InboxPage() {
       {selectedConv ? (
         <>
           {/* Chat header */}
-          <div className="flex items-center gap-3 px-4 py-3 bg-white border-b border-slate-200 shadow-sm z-10">
+          <div className="flex items-center gap-3 px-4 py-3 bg-white border-b border-slate-100 z-10">
             <button
               onClick={() => setMobileView('list')}
               className="md:hidden p-1.5 -ml-1.5 rounded-xl text-slate-500 hover:bg-slate-100 active:bg-slate-200 transition-colors"
@@ -704,71 +704,72 @@ export default function InboxPage() {
 
   /* ── Contact info panel ─────────────────────────────────── */
   const ContactPanel = selectedConv && contact && (
-    <div className="hidden lg:flex flex-col w-72 xl:w-80 border-l border-slate-200 bg-white shrink-0 overflow-y-auto">
-      {/* Gradient top */}
-      <div className="relative h-20 bg-gradient-to-br from-[#25D366] to-[#128C7E] shrink-0" />
-
-      {/* Avatar overlapping gradient */}
-      <div className="flex flex-col items-center -mt-8 px-5 pb-4 border-b border-slate-100">
-        <div className="ring-4 ring-white rounded-full shadow-lg">
-          <Avatar name={contact.name} phone={contact.phone} size="xl" />
+    <div className="hidden lg:flex flex-col w-64 xl:w-72 border-l border-slate-100 bg-white shrink-0">
+      {/* Profile section */}
+      <div className="px-5 pt-7 pb-5 border-b border-slate-100 text-center">
+        <div className={`w-16 h-16 bg-linear-to-br ${avatarGradient(contact.name || contact.phone || '')} rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-3 shadow-sm`}>
+          {(contact.name || contact.phone || '?')[0].toUpperCase()}
         </div>
-        <h4 className="font-bold text-slate-900 mt-3 text-base text-center">{contact.name || 'Unknown'}</h4>
-        <p className="text-sm text-slate-400 mt-0.5">{contact.phone}</p>
-        <div className="mt-2">
-          <StatusPill status={selectedConv.status} />
-        </div>
+        <h4 className="font-bold text-slate-900 text-sm leading-tight">{contact.name || 'Unknown'}</h4>
+        <p className="text-xs text-slate-400 mt-0.5 mb-2.5 font-mono">{contact.phone}</p>
+        <StatusPill status={selectedConv.status} />
       </div>
 
-      {/* Details */}
-      <div className="p-4 space-y-3 flex-1">
-        <div className="bg-slate-50 rounded-xl p-3.5">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Stage</p>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-100 rounded-full text-sm font-semibold capitalize">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+      {/* Info rows */}
+      <div className="flex-1 overflow-y-auto">
+        {/* Stage */}
+        <div className="px-5 py-4 border-b border-slate-100">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Stage</p>
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-semibold capitalize">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
             {contact.stage || 'new'}
           </span>
         </div>
 
-        <div className="bg-slate-50 rounded-xl p-3.5">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Tags</p>
+        {/* Tags */}
+        <div className="px-5 py-4 border-b border-slate-100">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Tags</p>
           <div className="flex flex-wrap gap-1.5">
             {(contact.tags || []).map((tag) => <TagBadge key={tag} tag={tag} />)}
             {(!contact.tags || contact.tags.length === 0) && (
-              <span className="text-slate-400 text-xs italic">No tags</span>
+              <span className="text-slate-400 text-xs">No tags</span>
             )}
           </div>
         </div>
 
-        <div className="bg-slate-50 rounded-xl p-3.5 space-y-2.5">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Conversation</p>
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-slate-500">Status</span>
+        {/* Conversation meta */}
+        <div className="px-5 py-4 border-b border-slate-100 space-y-3">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Conversation</p>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-slate-500">Status</span>
             <StatusPill status={selectedConv.status} />
           </div>
           {selectedConv.lastMessageAt && (
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-500">Last message</span>
-              <span className="text-slate-700 font-semibold">{formatTime(selectedConv.lastMessageAt)}</span>
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-slate-500">Last message</span>
+              <span className="text-xs text-slate-700 font-medium">{formatTime(selectedConv.lastMessageAt)}</span>
             </div>
           )}
           {selectedConv.unreadCount > 0 && (
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-500">Unread</span>
-              <span className="w-5 h-5 bg-[#25D366] text-white text-[10px] font-black rounded-full flex items-center justify-center">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-slate-500">Unread</span>
+              <span className="min-w-4.5 h-4.5 px-1 bg-[#25D366] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                 {selectedConv.unreadCount}
               </span>
             </div>
           )}
         </div>
 
+        {/* Take over action */}
         {selectedConv.status === 'ai_active' && (
-          <button
-            onClick={takeOver}
-            className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-orange-400 to-amber-500 text-white rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition-all active:scale-[0.98]"
-          >
-            <span>👤</span> Take Over from AI
-          </button>
+          <div className="px-5 py-4">
+            <button
+              onClick={takeOver}
+              className="w-full flex items-center justify-center gap-2 py-2.5 bg-orange-50 hover:bg-orange-100 text-orange-600 border border-orange-100 rounded-xl text-xs font-bold transition-colors"
+            >
+              <span>👤</span> Take Over from AI
+            </button>
+          </div>
         )}
       </div>
     </div>
